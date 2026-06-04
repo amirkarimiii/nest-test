@@ -1,17 +1,13 @@
-import {validateEnv} from "./env.validation";
-
-const env = validateEnv();
-
 export default () => ({
     app: {
-        name: env.APP_NAME,
-        port: env.APP_PORT
+        name: process.env.APP_NAME,
+        port: Number(process.env.APP_PORT) || 3000,
     },
     swagger: {
-        enabled: env.SWAGGER_ENABLED,
-        path: env.SWAGGER_PATH,
-        title: env.SWAGGER_TITLE,
-        description: env.SWAGGER_DESCRIPTION,
-        version: env.SWAGGER_VERSION,
+        enabled: process.env.SWAGGER_ENABLED === 'true',
+        path: process.env.SWAGGER_PATH,
+        title: process.env.SWAGGER_TITLE,
+        description: process.env.SWAGGER_DESCRIPTION,
+        version: process.env.SWAGGER_VERSION,
     },
 });

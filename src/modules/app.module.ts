@@ -7,11 +7,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {HealthModule} from "./health/health.module";
 import {UsersModule} from "./user/user.module";
+import {validateEnv} from "../config/env.validation";
 
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
-    load: [configuration]
+    load: [configuration],
+    validate: validateEnv,
   }),
     HealthModule,
     UsersModule

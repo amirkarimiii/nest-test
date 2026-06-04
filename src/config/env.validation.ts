@@ -24,6 +24,6 @@ export const envSchema = z.object({
 
 export type EnvVariables = z.infer<typeof envSchema>;
 
-export function validateEnv() {
-    return envSchema.parse(process.env);
+export function validateEnv(config: Record<string, any>) {
+    return envSchema.parse(config);
 }
