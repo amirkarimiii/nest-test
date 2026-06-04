@@ -7,5 +7,5 @@ export class HealthResponseDto {
         enum: ['UP', 'DOWN', 'DEGRADED'],
         type: String,
     })
-    status: string;
+    readonly status: string;
 }

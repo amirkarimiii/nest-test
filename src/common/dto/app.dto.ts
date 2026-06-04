@@ -6,5 +6,5 @@ export class MessageResponseDto {
         example: 'Hello World!',
         type: String,
     })
-    message: string;
+    readonly message: string;
 }
