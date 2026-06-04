@@ -6,7 +6,7 @@ import {
     ApiResponse,
     ApiOkResponse
 } from '@nestjs/swagger';
-import {MessageResponseDto} from "../../common/dto/app.dto";
+import {MessageResponseDto} from "../common/dto/app.dto";
 
 @ApiTags('General')
 @Controller()
