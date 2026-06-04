@@ -1,21 +1,49 @@
 import { INestApplication } from '@nestjs/common';
-import { SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-import { swaggerConfig, swaggerCustomOptions } from './swagger.config';
+import { SwaggerModule } from '@nestjs/swagger';
 
-export function setupSwagger(app: INestApplication) {
-    const configService = app.get(ConfigService);
-    const isSwaggerEnabled = configService.get<boolean>('swagger.enabled');
+import {
+    buildSwaggerConfig,
+    swaggerCustomOptions,
+} from './swagger.config';
 
-    if (!isSwaggerEnabled) {
-        console.log('⚠️  Swagger is disabled');
+export function setupSwagger(
+    app: INestApplication,
+) {
+    const config = app.get(ConfigService);
+
+    const enabled =
+        config.get<boolean>('swagger.enabled');
+
+    if (!enabled) {
         return;
     }
 
-    const swaggerPath = configService.get<string>('swagger.path', 'api');
+    const title =
+        config.get<string>('swagger.title')!;
 
-    const document = SwaggerModule.createDocument(app, swaggerConfig);
-    SwaggerModule.setup(swaggerPath, app, document, swaggerCustomOptions);
+    const description =
+        config.get<string>('swagger.description')!;
 
-    console.log(`📚 Swagger documentation available at: /${swaggerPath}`);
+    const version =
+        config.get<string>('swagger.version')!;
+
+    const path =
+        config.get<string>('swagger.path')!;
+
+    const document = SwaggerModule.createDocument(
+        app,
+        buildSwaggerConfig(
+            title,
+            description,
+            version,
+        ),
+    );
+
+    SwaggerModule.setup(
+        path,
+        app,
+        document,
+        swaggerCustomOptions,
+    );
 }
