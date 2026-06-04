@@ -7,7 +7,7 @@ import {
     ApiOkResponse,
     ApiServiceUnavailableResponse
 } from '@nestjs/swagger';
-import {HealthResponseDto} from "../../common/dto/health.dto";
+import {HealthResponseDto} from "./dto/health.dto";
 
 @ApiTags('Health Check')
 @Controller("health")
