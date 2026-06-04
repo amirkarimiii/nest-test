@@ -1,11 +1,12 @@
 import {ApiProperty} from "@nestjs/swagger";
+import {HealthStatus} from "../enums/healthStatus";
 
 export class HealthResponseDto {
     @ApiProperty({
         description: 'service health response description',
         example: 'UP',
-        enum: ['UP', 'DOWN', 'DEGRADED'],
+        enum: HealthStatus,
         type: String,
     })
-    readonly status: string;
+    readonly status: HealthStatus;
 }
