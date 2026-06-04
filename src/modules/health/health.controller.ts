@@ -29,7 +29,7 @@ export class HealthController {
         status: 500,
         description: 'Service internal error',
     })
-    health() {
+    health(): HealthResponseDto {
         return this.healthService.health();
     }
 }

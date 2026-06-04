@@ -27,7 +27,7 @@ export class AppController {
         status: 500,
         description: 'internal server error',
     })
-    getHello() {
+    getHello(): MessageResponseDto{
         return this.appService.getHello();
     }
 }
