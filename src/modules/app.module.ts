@@ -11,7 +11,10 @@ import {HealthModule} from "./health/health.module";
   imports: [ConfigModule.forRoot({
     isGlobal: true,
     load: [configuration]
-  }), HealthModule],
+  }),
+    HealthModule,
+    UsersModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
