@@ -1,5 +1,5 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Post} from "@nestjs/common";
-import {ApiCreatedResponse, ApiOkResponse, ApiTags} from "@nestjs/swagger";
+import {Body, Controller, Get, Param, ParseBoolPipe, ParseIntPipe, Post, Query} from "@nestjs/common";
+import {ApiCreatedResponse, ApiOkResponse, ApiQuery, ApiTags} from "@nestjs/swagger";
 import {UsersService} from "./user.service";
 import { UserResponseDto } from "./dto/user-response.dto";
 import {CreateUserDto} from "./dto/create-user.dto";
@@ -15,8 +15,9 @@ export class UsersController {
         type: UserResponseDto,
         isArray: true,
     })
-    async findAll() {
-        return this.userService.findAll();
+    @ApiQuery({ name: 'isActive', required: false, type: Boolean })
+    async findAll(@Query('isActive', new ParseBoolPipe({ optional: true })) isActive?: boolean) {
+        return this.userService.findAll(isActive);
     }
 
     @Get(':id')
