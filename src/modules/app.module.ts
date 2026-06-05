@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import {HealthModule} from "./health/health.module";
 import {UsersModule} from "./user/user.module";
 import {validateEnv} from "../config/env.validation";
+import {PrismaModule} from "../../prisma/prisma.module";
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -16,7 +17,8 @@ import {validateEnv} from "../config/env.validation";
     validate: validateEnv,
   }),
     HealthModule,
-    UsersModule
+    UsersModule,
+    PrismaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
