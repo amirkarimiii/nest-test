@@ -10,4 +10,7 @@ export class UserResponseDto {
 
     @ApiProperty()
     readonly email: string;
+
+    @ApiProperty()
+    readonly createdAt: Date;
 }
