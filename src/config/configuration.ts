@@ -3,6 +3,9 @@ export default () => ({
         name: process.env.APP_NAME,
         port: Number(process.env.APP_PORT) || 3000,
     },
+    database: {
+        url: process.env.DATABASE_URL,
+    },
     swagger: {
         enabled: process.env.SWAGGER_ENABLED === 'true',
         path: process.env.SWAGGER_PATH,
