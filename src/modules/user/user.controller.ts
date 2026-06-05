@@ -15,7 +15,7 @@ export class UsersController {
         type: UserResponseDto,
         isArray: true,
     })
-    findAll() {
+    async findAll() {
         return this.userService.findAll();
     }
 
@@ -23,7 +23,7 @@ export class UsersController {
     @ApiOkResponse({
         type: UserResponseDto,
     })
-    findById(
+    async findById(
         @Param('id', ParseIntPipe)
         id: number,
     ) {
@@ -34,7 +34,7 @@ export class UsersController {
     @ApiCreatedResponse({
         type: UserResponseDto,
     })
-    create(
+    async create(
         @Body()
         dto: CreateUserDto,
     ) {
