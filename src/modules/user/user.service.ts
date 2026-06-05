@@ -1,48 +1,30 @@
 import {Injectable, NotFoundException} from "@nestjs/common";
 import {CreateUserDto} from "./dto/create-user.dto";
+import { PrismaService } from "src/infrastructure/database/prisma.service";
 
 
 
 @Injectable()
 export class UsersService {
 
-    private users = [
-        {
-            id: 1,
-            name: "david",
-            email: "david@example.com",
-        }
-    ];
+    constructor(private readonly prisma: PrismaService) {}
 
-    findAll() {
-        return this.users;
+    async findAll() {
+        return this.prisma.user.findMany();
     }
 
-    findById(id: number) {
-
-        const user = this.users.find(
-            u => u.id === id,
-        );
-
+    async findById(id: number) {
+        const user = await this.prisma.user.findUnique({where: { id }});
         if (!user) {
             throw new NotFoundException(
                 `User ${id} not found`,
             );
         }
-
         return user;
     }
 
-    create(dto: CreateUserDto) {
-
-        const user = {
-            id: this.users.length + 1,
-            ...dto,
-        };
-
-        this.users.push(user);
-
-        return user;
+    async create(dto: CreateUserDto) {
+        return this.prisma.user.create({data: dto});
     }
 
 }
