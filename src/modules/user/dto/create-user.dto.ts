@@ -1,4 +1,5 @@
 import {
+    IsBoolean,
     IsEmail,
     IsString,
     MinLength,
@@ -13,11 +14,24 @@ export class CreateUserDto {
     })
     @IsString()
     @MinLength(2)
-    readonly name: string;
+    readonly firstname: string;
+
+    @ApiProperty({
+        example: 'Ali',
+    })
+    @IsString()
+    @MinLength(2)
+    readonly lastname: string;
 
     @ApiProperty({
         example: 'ali@test.com',
     })
     @IsEmail()
     readonly email: string;
+
+    @ApiProperty({
+        example: true,
+    })
+    @IsBoolean()
+    readonly isActive: boolean;
 }

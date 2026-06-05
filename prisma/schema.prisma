@@ -13,7 +13,11 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
 
-  name      String
+  firstname String
+
+  lastname  String
+
+  isActive  Boolean  @default(true)
 
   email     String   @unique
 

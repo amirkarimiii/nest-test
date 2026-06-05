@@ -6,7 +6,13 @@ export class UserResponseDto {
     readonly id: number;
 
     @ApiProperty()
-    readonly name: string;
+    readonly firstname: string;
+
+    @ApiProperty()
+    readonly lastname: string;
+
+    @ApiProperty()
+    readonly isActive: boolean;
 
     @ApiProperty()
     readonly email: string;
