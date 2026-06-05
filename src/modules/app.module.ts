@@ -8,7 +8,7 @@ import { AppService } from './app.service';
 import {HealthModule} from "./health/health.module";
 import {UsersModule} from "./user/user.module";
 import {validateEnv} from "../config/env.validation";
-import {PrismaModule} from "../../prisma/prisma.module";
+import {PrismaModule} from "../infrastructure/database/prisma.module";
 
 @Module({
   imports: [ConfigModule.forRoot({
