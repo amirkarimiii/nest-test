@@ -23,10 +23,10 @@ export function buildSwaggerConfig(
         .addApiKey(
             {
                 type: 'apiKey',
-                name: 'x-internal-server',
+                name: 'x-internal-service',
                 in: 'header',
             },
-            'internal-server-auth',
+            'internal-service-auth',
         )
         .build();
 }

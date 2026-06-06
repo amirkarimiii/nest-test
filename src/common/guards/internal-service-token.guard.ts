@@ -3,7 +3,7 @@ import {ConfigService} from "@nestjs/config";
 
 
 @Injectable()
-export class InternalServerTokenGuard implements CanActivate {
+export class InternalServiceTokenGuard implements CanActivate {
 
     constructor( private readonly configService: ConfigService ) {}
 
