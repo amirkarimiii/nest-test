@@ -4,11 +4,15 @@ import {UsersService} from "./user.service";
 import { UserResponseDto } from "./dto/user-response.dto";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {ApiKeyGuard} from "../../common/guards/api-key.guard";
+import {InternalServerTokenGuard} from "../../common/guards/internal-server-token.guard";
 
 
 @ApiTags('Users')
 @Controller('users')
-@UseGuards(ApiKeyGuard)
+@UseGuards(
+    ApiKeyGuard,
+    InternalServerTokenGuard
+)
 @ApiSecurity('api-key-auth')
 export class UsersController {
     constructor(private readonly userService: UsersService) {}
