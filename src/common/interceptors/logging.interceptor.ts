@@ -10,20 +10,20 @@ export class LoggingInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> {
 
         const request = context.switchToHttp().getRequest();
-        const {method, originalUrl} = request;
+        const {method, originalUrl, requestId} = request;
 
         const startTime = Date.now();
 
         return next.handle().pipe(
             tap(() => {
                 const duration = Date.now() - startTime;
-                this.logger.log(`${method} ${originalUrl} ${duration}ms`);
+                this.logger.log(`[${requestId}] ${method} ${originalUrl} ${duration}ms`);
             }),
             catchError((error) => {
 
                 const duration = Date.now() - startTime;
 
-                this.logger.error(`${method} ${originalUrl} FAILED ${duration}ms`);
+                this.logger.error(`[${requestId}] ${method} ${originalUrl} FAILED ${duration}ms`);
 
                 return throwError(
                     () => error,
