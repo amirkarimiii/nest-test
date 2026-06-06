@@ -20,6 +20,14 @@ export function buildSwaggerConfig(
             },
             'api-key-auth',
         )
+        .addApiKey(
+            {
+                type: 'apiKey',
+                name: 'x-internal-server',
+                in: 'header',
+            },
+            'internal-server-auth',
+        )
         .build();
 }
 

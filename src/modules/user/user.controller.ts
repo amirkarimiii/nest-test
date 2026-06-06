@@ -14,6 +14,7 @@ import {InternalServerTokenGuard} from "../../common/guards/internal-server-toke
     InternalServerTokenGuard
 )
 @ApiSecurity('api-key-auth')
+@ApiSecurity('internal-server-auth')
 export class UsersController {
     constructor(private readonly userService: UsersService) {}
 
