@@ -11,6 +11,8 @@ export const envSchema = z.object({
         'production',
     ]),
 
+    API_KEY: z.string().min(32),
+
     DATABASE_URL: z.url({ message: 'Invalid DATABASE_URL format' }),
 
     SWAGGER_ENABLED: z.coerce.boolean(),
