@@ -3,7 +3,7 @@ import {AppModule} from './modules/app.module';
 import {ConfigService} from "@nestjs/config";
 import {setupSwagger} from "./config/swagger.setup";
 import {ValidationPipe} from "@nestjs/common";
-import {GlobalExceptionFilter} from "./common/exceptions/global-exception.filter";
+import {GlobalExceptionFilter} from "./common/filters/exceptions/global-exception.filter";
 import { ResponseInterceptor } from "./common/interceptors/response.interceptor";
 import {LoggingInterceptor} from "./common/interceptors/logging.interceptor";
 
