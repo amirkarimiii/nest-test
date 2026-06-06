@@ -4,6 +4,7 @@ import {ConfigService} from "@nestjs/config";
 import {setupSwagger} from "./config/swagger.setup";
 import {ValidationPipe} from "@nestjs/common";
 import {GlobalExceptionFilter} from "./common/exceptions/global-exception.filter";
+import { ResponseInterceptor } from "./common/interceptors/response.interceptor";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -21,6 +22,7 @@ async function bootstrap() {
         new GlobalExceptionFilter(),
     );
     const configService = app.get(ConfigService);
+    app.useGlobalInterceptors( new ResponseInterceptor());
     const port = configService.get<number>('app.port', 3000);
     setupSwagger(app);
     await app.listen(port);
