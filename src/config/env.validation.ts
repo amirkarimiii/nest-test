@@ -12,6 +12,7 @@ export const envSchema = z.object({
     ]),
 
     API_KEY: z.string().min(32),
+    INTERNAL_SERVICE_TOKEN: z.string().min(32),
 
     DATABASE_URL: z.url({ message: 'Invalid DATABASE_URL format' }),
 

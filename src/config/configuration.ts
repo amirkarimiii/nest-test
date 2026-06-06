@@ -9,6 +9,7 @@ export default () => ({
     },
     security: {
         apiKey: process.env.API_KEY,
+        internalServiceToken: process.env.INTERNAL_SERVICE_TOKEN,
     },
     swagger: {
         enabled: process.env.SWAGGER_ENABLED === 'true',
