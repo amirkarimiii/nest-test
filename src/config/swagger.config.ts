@@ -12,13 +12,13 @@ export function buildSwaggerConfig(
         .setTitle(title)
         .setDescription(description)
         .setVersion(version)
-        .addBearerAuth(
+        .addApiKey(
             {
-                type: 'http',
-                scheme: 'bearer',
-                bearerFormat: 'JWT',
+                type: 'apiKey',
+                name: 'x-api-key',
+                in: 'header',
             },
-            'JWT-auth',
+            'api-key-auth',
         )
         .build();
 }

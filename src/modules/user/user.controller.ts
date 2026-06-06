@@ -1,12 +1,15 @@
-import {Body, Controller, Get, Param, ParseBoolPipe, ParseIntPipe, Post, Query} from "@nestjs/common";
-import {ApiCreatedResponse, ApiOkResponse, ApiQuery, ApiTags} from "@nestjs/swagger";
+import {Body, Controller, Get, Param, ParseBoolPipe, ParseIntPipe, Post, Query, UseGuards} from "@nestjs/common";
+import {ApiCreatedResponse, ApiOkResponse, ApiQuery, ApiSecurity, ApiTags} from "@nestjs/swagger";
 import {UsersService} from "./user.service";
 import { UserResponseDto } from "./dto/user-response.dto";
 import {CreateUserDto} from "./dto/create-user.dto";
+import {ApiKeyGuard} from "../../common/guards/api-key.guard";
 
 
 @ApiTags('Users')
 @Controller('users')
+@UseGuards(ApiKeyGuard)
+@ApiSecurity('api-key-auth')
 export class UsersController {
     constructor(private readonly userService: UsersService) {}
 
