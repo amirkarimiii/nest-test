@@ -7,6 +7,11 @@ export default () => ({
     database: {
         url: process.env.DATABASE_URL,
     },
+    cache: {
+        host: process.env.CACHE_HOST,
+        port: Number(process.env.CACHE_PORT),
+        ttl: Number(process.env.CACHE_TTL),
+    },
     security: {
         apiKey: process.env.API_KEY,
         internalServiceToken: process.env.INTERNAL_SERVICE_TOKEN,

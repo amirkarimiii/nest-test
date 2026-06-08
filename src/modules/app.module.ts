@@ -23,11 +23,7 @@ import {CacheModule} from "./cache/cache.module";
         UsersModule,
         PrismaModule,
         LifecycleModule,
-        CacheModule.forRoot({
-            host: "112.32.5.200",
-            port: 6698,
-            ttl: 0
-        })
+        CacheModule.forRootAsync()
     ],
     controllers: [AppController],
     providers: [AppService],
