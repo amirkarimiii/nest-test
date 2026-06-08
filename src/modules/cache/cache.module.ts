@@ -1,6 +1,6 @@
 import {DynamicModule, Module} from "@nestjs/common";
 import {CacheOptions} from "../../common/interfaces/cache-options.interface";
-import {CacheService} from "./cach.service";
+import {CacheService} from "./cache.service";
 
 
 @Module({})
