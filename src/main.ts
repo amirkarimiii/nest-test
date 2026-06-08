@@ -22,6 +22,7 @@ async function bootstrap() {
     app.useGlobalFilters(
         new GlobalExceptionFilter(),
     );
+    app.enableShutdownHooks();
     const configService = app.get(ConfigService);
     app.useGlobalInterceptors(
         new LoggingInterceptor(),
