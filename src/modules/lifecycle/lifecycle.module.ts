@@ -3,6 +3,7 @@ import {StartupService} from "./startup.service";
 import {BootstrapService} from "./bootstrap.service";
 import {DestroyService} from "./destroy.service";
 import {BeforeShutdownService} from "./before-shutdown.service";
+import {ShutdownService} from "./shutdown.service";
 
 
 @Module({
@@ -10,7 +11,8 @@ import {BeforeShutdownService} from "./before-shutdown.service";
         StartupService,
         BootstrapService,
         DestroyService,
-        BeforeShutdownService
+        BeforeShutdownService,
+        ShutdownService
     ]
 })
 
