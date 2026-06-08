@@ -6,7 +6,7 @@ import type {CacheOptions} from "../../common/interfaces/cache-options.interface
 export class CacheService {
     constructor(@Inject('CACHE_OPTIONS') private readonly options: CacheOptions) {}
 
-    getConfig(){
+    getOptions(): CacheOptions {
         return this.options;
     }
 }
