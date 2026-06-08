@@ -14,11 +14,14 @@ export class CacheModule {
                 {
                     provide: "CACHE_OPTIONS",
                     inject: [ConfigService],
-                    useFactory: (configService: ConfigService) => ({
-                        host: configService.get('cache.host'),
-                        port: configService.get('cache.port'),
-                        ttl: configService.get('cache.ttl'),
-                    })
+                    useFactory: (configService: ConfigService) => {
+                        const option: CacheOptions = {
+                            host: configService.get('cache.host') as string,
+                            port: configService.get('cache.port') as number,
+                            ttl: configService.get('cache.ttl') as number
+                        }
+                        return option
+                    }
                 },
                 CacheService
             ],
