@@ -11,6 +11,7 @@ import {validateEnv} from "../config/env.validation";
 import {PrismaModule} from "../infrastructure/database/prisma.module";
 import {RequestIdMiddleware} from "../common/middlewares/request-id.middleware";
 import {LifecycleModule} from "./lifecycle/lifecycle.module";
+import {CacheModule} from "./cache/cache.module";
 
 @Module({
     imports: [ConfigModule.forRoot({
@@ -21,7 +22,12 @@ import {LifecycleModule} from "./lifecycle/lifecycle.module";
         HealthModule,
         UsersModule,
         PrismaModule,
-        LifecycleModule
+        LifecycleModule,
+        CacheModule.forRoot({
+            host: "112.32.5.200",
+            port: 6698,
+            ttl: 0
+        })
     ],
     controllers: [AppController],
     providers: [AppService],
