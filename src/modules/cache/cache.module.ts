@@ -6,7 +6,7 @@ import {CacheService} from "./cach.service";
 @Module({})
 export class CacheModule {
 
-    static forRoutes(options: CacheOptions): DynamicModule {
+    static forRoot(options: CacheOptions): DynamicModule {
         return {
             module: CacheModule,
             providers: [
