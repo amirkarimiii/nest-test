@@ -10,6 +10,7 @@ import {UsersModule} from "./user/user.module";
 import {validateEnv} from "../config/env.validation";
 import {PrismaModule} from "../infrastructure/database/prisma.module";
 import {RequestIdMiddleware} from "../common/middlewares/request-id.middleware";
+import {LifecycleModule} from "./lifecycle/lifecycle.module";
 
 @Module({
     imports: [ConfigModule.forRoot({
@@ -20,6 +21,7 @@ import {RequestIdMiddleware} from "../common/middlewares/request-id.middleware";
         HealthModule,
         UsersModule,
         PrismaModule,
+        LifecycleModule
     ],
     controllers: [AppController],
     providers: [AppService],
