@@ -1,4 +1,4 @@
-import {Controller, Get, Injectable} from "@nestjs/common";
+import {Controller, Get, Injectable, Param} from "@nestjs/common";
 import {MicroserviceService} from "./microservice.service";
 
 
@@ -8,8 +8,13 @@ export class MicroserviceController {
     constructor(private readonly microService: MicroserviceService) {}
 
     @Get('test')
-    getHello() {
-        return this.microService.getHello();
+    gerUsers() {
+        return this.microService.getUser();
+    }
+
+    @Get('test-id')
+    getUserById() {
+        return this.microService.getUserById();
     }
 
 }
