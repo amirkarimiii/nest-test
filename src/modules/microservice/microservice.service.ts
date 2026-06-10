@@ -1,6 +1,7 @@
 import {Inject, Injectable} from "@nestjs/common";
 import {ClientProxy} from "@nestjs/microservices";
 import {firstValueFrom} from "rxjs";
+import {CreateUserDto} from "../../common/dto/create-user.dto";
 
 
 @Injectable()
@@ -16,7 +17,15 @@ export class MicroserviceService {
         return await firstValueFrom(this.client.send('get-user-by-id', {}));
     }
 
-    async getUserMessage() {
-        return await firstValueFrom(this.client.emit('user-message', {}));
+    getUserMessage() {
+        this.client.emit('user-message', {});
     }
+
+    notifyUserCreation(user: CreateUserDto) {
+        this.client.emit('create-user', {
+            name: `${user.firstname} ${user.lastname}`,
+            email: user.email,
+        });
+    }
+
 }

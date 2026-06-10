@@ -1,8 +1,8 @@
 import {Body, Controller, Get, Param, ParseBoolPipe, ParseIntPipe, Post, Query, UseGuards} from "@nestjs/common";
 import {ApiCreatedResponse, ApiOkResponse, ApiQuery, ApiSecurity, ApiTags} from "@nestjs/swagger";
 import {UsersService} from "./user.service";
-import { UserResponseDto } from "./dto/user-response.dto";
-import {CreateUserDto} from "./dto/create-user.dto";
+import { UserResponseDto } from "../../common/dto/user-response.dto";
+import {CreateUserDto} from "../../common/dto/create-user.dto";
 import {ApiKeyGuard} from "../../common/guards/api-key.guard";
 import {InternalServiceTokenGuard} from "../../common/guards/internal-service-token.guard";
 
