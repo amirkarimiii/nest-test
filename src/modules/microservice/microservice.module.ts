@@ -19,3 +19,4 @@ import {MicroserviceService} from "./microservice.service";
     providers: [MicroserviceService],
     exports: [MicroserviceService],
 })
+export class MicroserviceModule {}
