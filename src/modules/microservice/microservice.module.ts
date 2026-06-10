@@ -1,5 +1,6 @@
 import {Module} from "@nestjs/common";
 import {ClientsModule, Transport} from "@nestjs/microservices";
+import {MicroserviceService} from "./microservice.service";
 
 
 @Module({
@@ -14,5 +15,7 @@ import {ClientsModule, Transport} from "@nestjs/microservices";
                 }
             }
         ]),
-    ]
+    ],
+    providers: [MicroserviceService],
+    exports: [MicroserviceService],
 })
