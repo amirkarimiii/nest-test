@@ -12,6 +12,7 @@ import {PrismaModule} from "../infrastructure/database/prisma.module";
 import {RequestIdMiddleware} from "../common/middlewares/request-id.middleware";
 import {LifecycleModule} from "./lifecycle/lifecycle.module";
 import {CacheModule} from "./cache/cache.module";
+import {MicroserviceModule} from "./microservice/microservice.module";
 
 @Module({
     imports: [ConfigModule.forRoot({
@@ -23,7 +24,8 @@ import {CacheModule} from "./cache/cache.module";
         UsersModule,
         PrismaModule,
         LifecycleModule,
-        CacheModule.forRootAsync()
+        CacheModule.forRootAsync(),
+        MicroserviceModule
     ],
     controllers: [AppController],
     providers: [AppService],
