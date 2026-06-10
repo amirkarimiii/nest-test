@@ -17,4 +17,9 @@ export class MicroserviceController {
         return this.microService.getUserById();
     }
 
+    @Get('test-msg')
+    getUserMessage() {
+        return this.microService.getUserMessage();
+    }
+
 }

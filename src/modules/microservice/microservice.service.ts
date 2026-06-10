@@ -15,4 +15,8 @@ export class MicroserviceService {
     async getUserById() {
         return await firstValueFrom(this.client.send('get-user-by-id', {}));
     }
+
+    async getUserMessage() {
+        return await firstValueFrom(this.client.emit('user-message', {}));
+    }
 }
