@@ -12,7 +12,8 @@ export class OutboxService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly microservice: MicroserviceService,
-    ) {}
+    ) {
+    }
 
     @Cron(CronExpression.EVERY_5_SECONDS)
     async publishEvents() {
@@ -47,6 +48,18 @@ export class OutboxService {
             }
         }
 
+    }
+
+    async getUnprocessedEvents() {
+        return this.prisma.outboxEvent.findMany({
+            where: {
+                processed: false
+            },
+            take: 100,
+            orderBy: {
+                createdAt: 'asc'
+            }
+        });
     }
 
 }
