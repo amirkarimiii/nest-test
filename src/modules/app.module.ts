@@ -14,6 +14,7 @@ import {LifecycleModule} from "./lifecycle/lifecycle.module";
 import {CacheModule} from "./cache/cache.module";
 import {MicroserviceModule} from "./microservice/microservice.module";
 import {ScheduleModule} from "@nestjs/schedule";
+import {OutboxModule} from "./outbox/outbox.module";
 
 @Module({
     imports: [ConfigModule.forRoot({
@@ -27,7 +28,8 @@ import {ScheduleModule} from "@nestjs/schedule";
         LifecycleModule,
         CacheModule.forRootAsync(),
         MicroserviceModule,
-        ScheduleModule.forRoot()
+        ScheduleModule.forRoot(),
+        OutboxModule
     ],
     controllers: [AppController],
     providers: [AppService],
