@@ -13,6 +13,7 @@ import {RequestIdMiddleware} from "../common/middlewares/request-id.middleware";
 import {LifecycleModule} from "./lifecycle/lifecycle.module";
 import {CacheModule} from "./cache/cache.module";
 import {MicroserviceModule} from "./microservice/microservice.module";
+import {ScheduleModule} from "@nestjs/schedule";
 
 @Module({
     imports: [ConfigModule.forRoot({
@@ -25,7 +26,8 @@ import {MicroserviceModule} from "./microservice/microservice.module";
         PrismaModule,
         LifecycleModule,
         CacheModule.forRootAsync(),
-        MicroserviceModule
+        MicroserviceModule,
+        ScheduleModule.forRoot()
     ],
     controllers: [AppController],
     providers: [AppService],
