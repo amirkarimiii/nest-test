@@ -33,7 +33,6 @@ export class UsersService {
     }
 
     async create(dto: CreateUserDto) {
-        this.microservice.notifyUserCreation(dto);
         return this.prisma.$transaction(
             async (tx) => {
                 const user = await tx.user.create({data: dto});

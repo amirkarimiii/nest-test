@@ -2,6 +2,8 @@ import {Inject, Injectable} from "@nestjs/common";
 import {ClientProxy} from "@nestjs/microservices";
 import {firstValueFrom} from "rxjs";
 import {CreateUserDto} from "../../common/dto/create-user.dto";
+import {EventTypesEnum} from "../../common/enums/event-types.enum";
+import {UserPayload} from "../../common/types/user-payload.type";
 
 
 @Injectable()
@@ -21,10 +23,9 @@ export class MicroserviceService {
         this.client.emit('user-message', {});
     }
 
-    notifyUserCreation(user: CreateUserDto) {
-        this.client.emit('create-user', {
-            name: `${user.firstname} ${user.lastname}`,
-            email: user.email,
+    notifyUserCreation(event: EventTypesEnum, payload: UserPayload) {
+        this.client.emit(event, {
+            payload
         });
     }
 
