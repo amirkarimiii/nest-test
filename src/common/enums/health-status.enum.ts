@@ -1,4 +1,4 @@
-export enum HealthStatus {
+export enum HealthStatusEnum {
     UP = 'UP',
     DOWN = 'DOWN',
     DEGRADED = 'DEGRADED',
