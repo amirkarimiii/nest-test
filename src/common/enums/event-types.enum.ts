@@ -1,3 +1,3 @@
 export enum EventTypesEnum {
-    USER_CREATED = 'user.created'
+    USER_CREATED = 'user-created'
 }
