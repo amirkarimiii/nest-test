@@ -15,7 +15,6 @@ export class OutboxQueue {
             eventType,
             {
                 payload,
-                outboxId,
             },
             {
                 jobId: outboxId,
