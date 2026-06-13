@@ -25,7 +25,7 @@ export class OutboxService {
             where: {
                 status: OutboxStatus.PENDING
             },
-            take: 100,
+            take: 20,
         });
 
         for (const event of events) {
@@ -45,7 +45,7 @@ export class OutboxService {
                             },
                         });
                     } else {
-                        throw new Error("Unable to parse payload type");
+                        throw new Error(`error: ${result.error}`);
                     }
                 }
             }

@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 export const UserPayloadSchema = z.object({
-    id: z.string(),
+    id: z.number(),
     firstname: z.string(),
     lastname: z.string(),
     email: z.email(),
