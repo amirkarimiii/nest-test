@@ -27,17 +27,23 @@ model User {
 }
 
 model OutboxEvent {
-  id          String   @id @default(uuid())
-
+  id          String   @id @default(cuid())
   eventType   String
-
   payload     Json
-
-  processed   Boolean  @default(false)
-
-  createdAt   DateTime @default(now())
-
+  status      OutboxStatus @default(PENDING)
+  attempts    Int      @default(0)
+  lastAttempt DateTime?
   processedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  @@index([processed])
+  @@index([status, createdAt])
+  @@index([eventType])
+}
+
+enum OutboxStatus {
+  PENDING
+  ENQUEUED
+  PROCESSED
+  FAILED
 }

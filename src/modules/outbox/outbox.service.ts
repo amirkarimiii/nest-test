@@ -4,6 +4,7 @@ import {PrismaService} from "../../infrastructure/database/prisma.service";
 import {EventTypesEnum} from "../../common/enums/event-types.enum";
 import {MicroserviceService} from "../microservice/microservice.service";
 import {UserPayloadSchema} from "../../common/types/user-payload.type";
+import { OutboxStatus } from "generated/prisma/enums";
 
 
 @Injectable()
@@ -18,9 +19,11 @@ export class OutboxService {
     @Cron(CronExpression.EVERY_5_SECONDS)
     async publishEvents() {
 
+        console.log(`${new Date().toLocaleString()} - outbox service publishEvents...`);
+
         const events = await this.prisma.outboxEvent.findMany({
             where: {
-                processed: false
+                status: OutboxStatus.PENDING
             },
             take: 100,
         });
@@ -37,7 +40,7 @@ export class OutboxService {
                                 id: event.id,
                             },
                             data: {
-                                processed: true,
+                                status: OutboxStatus.PROCESSED,
                                 processedAt: new Date(),
                             },
                         });
@@ -50,10 +53,30 @@ export class OutboxService {
 
     }
 
-    async getUnprocessedEvents() {
+    async getPendingEvents() {
         return this.prisma.outboxEvent.findMany({
             where: {
-                processed: false
+                status: OutboxStatus.PENDING
+            },
+            take: 100,
+            orderBy: {
+                createdAt: 'asc'
+            }
+        });
+    }
+
+    async getPendingEventsCount() {
+        return this.prisma.outboxEvent.count({
+            where: {
+                status: OutboxStatus.PENDING
+            }
+        });
+    }
+
+    async getProcessedEvents() {
+        return this.prisma.outboxEvent.findMany({
+            where: {
+                status: OutboxStatus.PROCESSED
             },
             take: 100,
             orderBy: {
