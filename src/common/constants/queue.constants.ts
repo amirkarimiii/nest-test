@@ -1,0 +1,1 @@
+export const OUTBOX_QUEUE = 'outbox-queue';
