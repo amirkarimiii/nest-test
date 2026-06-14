@@ -1,20 +1,35 @@
-import {Injectable, Logger} from "@nestjs/common";
+import {Injectable, Logger, OnModuleInit} from "@nestjs/common";
 import {PrismaService} from "../../infrastructure/database/prisma.service";
 import {EventTypesEnum} from "../../common/enums/event-types.enum";
-import {UserPayload, UserPayloadSchema} from "../../common/types/user-payload.type";
+import {UserPayloadSchema} from "../../common/types/user-payload.type";
 import {OutboxStatus} from "generated/prisma/enums";
 import {OutboxQueue} from "../../infrastructure/bull/queue/outbox.queue";
 import {Cron, CronExpression} from "@nestjs/schedule";
+import {EventHandlerInterface} from "./event-handler/event-handler.interface";
+import {ModuleRef} from "@nestjs/core";
+import {UserCreatedHandler} from "./event-handler/user-created.handler";
 
 
 @Injectable()
-export class OutboxService {
+export class OutboxService implements OnModuleInit {
+
+    private readonly handlersMap = new Map<string, EventHandlerInterface>();
 
     constructor(
         private readonly prisma: PrismaService,
         private readonly outboxQueue: OutboxQueue,
+        private readonly moduleRef: ModuleRef
     ) {}
 
+    onModuleInit() {
+        const handlers = [
+            this.moduleRef.get(UserCreatedHandler, { strict: false }),
+        ];
+
+        for (const handler of handlers) {
+            this.handlersMap.set(handler.eventType, handler);
+        }
+    }
     private readonly logger = new Logger(OutboxService.name);
 
     @Cron('*/20 * * * * *')
@@ -37,41 +52,31 @@ export class OutboxService {
             take: 20,
         });
         for (const event of events) {
-            switch (event.eventType) {
-                case EventTypesEnum.USER_CREATED: {
-                    const result = UserPayloadSchema.safeParse(event.payload);
-
-                    if (!result.success) {
-                        this.logger.error(`Validation failed for event ${event.id}: ${result.error}`);
-                        await this.prisma.outboxEvent.update({
-                            where: {id: event.id},
-                            data: {status: OutboxStatus.FAILED, attempts: {increment: 1}}
-                        });
-                        continue;
+            const handler = this.handlersMap.get(event.eventType);
+            if (!handler) {
+                this.logger.error(`No handler found for event type: ${event.eventType}`);
+                continue;
+            }
+            try {
+                await handler.handle(event.payload, event.id);
+                await this.prisma.outboxEvent.update({
+                    where: {
+                        id: event.id,
+                    },
+                    data: {
+                        status: OutboxStatus.ENQUEUED,
                     }
-
-                    try {
-                        await this.outboxQueue.addEvent(event.eventType, result.data, event.id);
-                        await this.prisma.outboxEvent.update({
-                            where: {
-                                id: event.id,
-                            },
-                            data: {
-                                status: OutboxStatus.ENQUEUED,
-                            }
-                        });
-                    } catch (error) {
-                        this.logger.error(`Failed to process event ${event.id}: ${error.message}`);
-                        await this.prisma.outboxEvent.update({
-                            where: {id: event.id},
-                            data: {
-                                status: OutboxStatus.FAILED,
-                                attempts: {increment: 1},
-                                updatedAt: new Date(),
-                            }
-                        }).catch(dbErr => this.logger.error(`Critical: DB update failed after outbox failure: ${dbErr.message}`));
+                });
+            } catch (error) {
+                this.logger.error(`Failed to process event ${event.id}: ${error.message}`);
+                await this.prisma.outboxEvent.update({
+                    where: {id: event.id},
+                    data: {
+                        status: OutboxStatus.FAILED,
+                        attempts: {increment: 1},
+                        updatedAt: new Date(),
                     }
-                }
+                }).catch(dbErr => this.logger.error(`Critical: DB update failed after outbox failure: ${dbErr.message}`));
             }
         }
 
