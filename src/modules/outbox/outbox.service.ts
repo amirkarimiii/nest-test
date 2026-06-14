@@ -22,7 +22,17 @@ export class OutboxService {
 
         const events = await this.prisma.outboxEvent.findMany({
             where: {
-                status: OutboxStatus.PENDING
+                OR: [
+                    {
+                        status: OutboxStatus.PENDING
+                    },
+                    {
+                        status: OutboxStatus.FAILED,
+                        attempts: {
+                            lt: 10
+                        }
+                    }
+                ]
             },
             take: 20,
         });
@@ -32,6 +42,15 @@ export class OutboxService {
                 case EventTypesEnum.USER_CREATED: {
                     const result = UserPayloadSchema.safeParse(event.payload);
                     if (result.success) {
+                        await this.prisma.outboxEvent.update({
+                            where: {
+                                id: event.id,
+                                status: OutboxStatus.PENDING
+                            },
+                            data: {
+                                status: OutboxStatus.ENQUEUED
+                            }
+                        })
                         await this.outboxQueue.addEvent(event.eventType, result.data, event.id)
                     } else {
                         throw new Error(`error: ${result.error}`);
