@@ -22,32 +22,22 @@ export class OutboxProcessor extends WorkerHost {
     }
 
     async process(job: Job) {
-        const {payload} = job.data;
+        const { payload } = job.data;
         const eventType = job.name;
         this.logger.log(`Processing outbox event: ${eventType} [${job.id}]`);
+        const time = new Date().toLocaleString();
         try {
-            switch (eventType) {
-                case EventTypesEnum.USER_CREATED: {
-                    const result = UserPayloadSchema.safeParse(payload);
-                    if (result.success) {
-                        const payload = result.data;
-                            await this.prisma.outboxEvent.update({
-                                where: {
-                                    id: job.id,
-                                },
-                                data: {
-                                    status: OutboxStatus.PROCESSED,
-                                    processedAt: new Date(),
-                                },
-                            });
-                            this.microservice.notifyUserCreation(eventType, payload);
-                        }
-                    // here it should be a else which notifies BullMQ that an error occurred
-                    }
-                    break;
-                default:
-                    this.logger.warn(`Unknown event type: ${eventType}`);
-            }
+            await this.prisma.outboxEvent.update({
+                where: {
+                    id: job.id
+                },
+                data: {
+                    status: OutboxStatus.PROCESSED,
+                    updatedAt: time,
+                    processedAt: time
+                }
+            });
+            await this.microservice.notifyUserCreation(eventType, payload);
         } catch (error) {
             this.logger.error(`Failed to process job ${job.id}`, error);
             throw error;

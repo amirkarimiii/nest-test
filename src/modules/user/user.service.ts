@@ -1,9 +1,7 @@
 import {Injectable, NotFoundException} from "@nestjs/common";
 import {CreateUserDto} from "../../common/dto/create-user.dto";
 import {PrismaService} from "src/infrastructure/database/prisma.service";
-import {MicroserviceService} from "../microservice/microservice.service";
 import {EventTypesEnum} from "../../common/enums/event-types.enum";
-import {OutboxService} from "../outbox/outbox.service";
 
 
 @Injectable()
@@ -11,7 +9,6 @@ export class UsersService {
 
     constructor(
         private readonly prisma: PrismaService,
-        private readonly outboxService: OutboxService,
     ) {
     }
 
@@ -34,15 +31,19 @@ export class UsersService {
     }
 
     async create(dto: CreateUserDto) {
-        return this.prisma.$transaction(
+        await this.prisma.$transaction(
             async (tx) => {
                 const user = await tx.user.create({data: dto});
-                await this.outboxService.publishEvents(
-                    EventTypesEnum.USER_CREATED, {
-                    id: user.id,
-                    firstname: user.firstname,
-                    lastname: user.lastname,
-                    email: user.email
+                await tx.outboxEvent.create({
+                    data: {
+                        eventType: EventTypesEnum.USER_CREATED,
+                        payload: {
+                            id: user.id,
+                            firstname: user.firstname,
+                            lastname: user.lastname,
+                            email: user.email
+                        }
+                    }
                 });
                 return user;
             }

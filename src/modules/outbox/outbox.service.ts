@@ -1,11 +1,10 @@
 import {Injectable, Logger} from "@nestjs/common";
-import {Cron, CronExpression} from "@nestjs/schedule";
 import {PrismaService} from "../../infrastructure/database/prisma.service";
 import {EventTypesEnum} from "../../common/enums/event-types.enum";
-import {MicroserviceService} from "../microservice/microservice.service";
 import {UserPayload, UserPayloadSchema} from "../../common/types/user-payload.type";
 import { OutboxStatus } from "generated/prisma/enums";
 import {OutboxQueue} from "../../infrastructure/bull/queue/outbox.queue";
+import {Cron, CronExpression} from "@nestjs/schedule";
 
 
 @Injectable()
@@ -14,21 +13,32 @@ export class OutboxService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly outboxQueue: OutboxQueue,
-    ) {
-    }
+    ) {}
 
     private readonly logger = new Logger(OutboxService.name);
 
-    async publishEvents(eventType: EventTypesEnum, payload: UserPayload) {
+    @Cron('*/20 * * * * *')
+    async publishEvents() {
 
-        const outboxEvent = await this.prisma.outboxEvent.create({
-            data: {
-                eventType,
-                payload,
+        const events = await this.prisma.outboxEvent.findMany({
+            where: {
+                status: OutboxStatus.PENDING
             },
+            take: 20,
         });
-        await this.outboxQueue.addEvent(eventType, payload, outboxEvent.id);
-        this.logger.log(`Outbox event created and queued: ${outboxEvent.id}`);
+
+        for (const event of events) {
+            switch (event.eventType) {
+                case EventTypesEnum.USER_CREATED: {
+                    const result = UserPayloadSchema.safeParse(event.payload);
+                    if (result.success) {
+                        await this.outboxQueue.addEvent(event.eventType, result.data, event.id)
+                    } else {
+                        throw new Error(`error: ${result.error}`);
+                    }
+                }
+            }
+        }
 
     }
 

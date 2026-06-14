@@ -23,7 +23,7 @@ export class MicroserviceService {
         this.client.emit('user-message', {});
     }
 
-    notifyUserCreation(event: EventTypesEnum, payload: UserPayload) {
+    async notifyUserCreation(event: EventTypesEnum | string, payload: UserPayload) {
         this.client.emit(event, {
             payload
         });
