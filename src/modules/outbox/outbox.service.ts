@@ -69,7 +69,6 @@ export class OutboxService implements OnModuleInit {
                     data: {
                         status: OutboxStatus.FAILED,
                         attempts: {increment: 1},
-                        updatedAt: new Date(),
                     }
                 }).catch(dbErr => this.logger.error(`Critical: DB update failed after outbox failure: ${dbErr.message}`));
             }

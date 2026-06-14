@@ -38,29 +38,23 @@ export class OutboxProcessor extends WorkerHost {
         const {payload} = job.data;
         const eventType = job.name;
         this.logger.log(`Processing outbox event: ${eventType} [${job.id}]`);
-        const time = new Date().toLocaleString();
+        const now = new Date();
         try {
             await this.microservice.notifyUserCreation(eventType, payload);
             await this.prisma.outboxEvent.update({
                 where: {
                     id: job.id,
-                    status: OutboxStatus.ENQUEUED,
                 },
                 data: {
                     status: OutboxStatus.PROCESSED,
-                    updatedAt: time,
-                    processedAt: time
+                    processedAt: now,
+                    lastAttempt: now
                 }
             });
         } catch (error) {
             this.logger.error(`Failed to process job ${job.id}`, error);
             throw error;
         }
-
-    }
-
-    @OnWorkerEvent('completed')
-    async onComplete(job: Job) {
 
     }
 
@@ -77,7 +71,7 @@ export class OutboxProcessor extends WorkerHost {
                 data: {
                     status: OutboxStatus.FAILED,
                     attempts: job.attemptsMade,
-                    lastAttempt: new Date()
+                    lastAttempt: new Date(),
                 }
             });
 
