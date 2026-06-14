@@ -2,7 +2,7 @@ import {Injectable, Logger} from "@nestjs/common";
 import {PrismaService} from "../../infrastructure/database/prisma.service";
 import {EventTypesEnum} from "../../common/enums/event-types.enum";
 import {UserPayload, UserPayloadSchema} from "../../common/types/user-payload.type";
-import { OutboxStatus } from "generated/prisma/enums";
+import {OutboxStatus} from "generated/prisma/enums";
 import {OutboxQueue} from "../../infrastructure/bull/queue/outbox.queue";
 import {Cron, CronExpression} from "@nestjs/schedule";
 
@@ -40,19 +40,36 @@ export class OutboxService {
             switch (event.eventType) {
                 case EventTypesEnum.USER_CREATED: {
                     const result = UserPayloadSchema.safeParse(event.payload);
-                    if (result.success) {
+
+                    if (!result.success) {
+                        this.logger.error(`Validation failed for event ${event.id}: ${result.error}`);
+                        await this.prisma.outboxEvent.update({
+                            where: {id: event.id},
+                            data: {status: OutboxStatus.FAILED, attempts: {increment: 1}}
+                        });
+                        continue;
+                    }
+
+                    try {
+                        await this.outboxQueue.addEvent(event.eventType, result.data, event.id);
                         await this.prisma.outboxEvent.update({
                             where: {
                                 id: event.id,
                             },
                             data: {
                                 status: OutboxStatus.ENQUEUED,
-                                updatedAt: new Date().toISOString(),
                             }
-                        })
-                        await this.outboxQueue.addEvent(event.eventType, result.data, event.id)
-                    } else {
-                        throw new Error(`error: ${result.error}`);
+                        });
+                    } catch (error) {
+                        this.logger.error(`Failed to process event ${event.id}: ${error.message}`);
+                        await this.prisma.outboxEvent.update({
+                            where: {id: event.id},
+                            data: {
+                                status: OutboxStatus.FAILED,
+                                attempts: {increment: 1},
+                                updatedAt: new Date(),
+                            }
+                        }).catch(dbErr => this.logger.error(`Critical: DB update failed after outbox failure: ${dbErr.message}`));
                     }
                 }
             }
@@ -61,7 +78,7 @@ export class OutboxService {
     }
 
     @Cron(CronExpression.EVERY_5_MINUTES)
-    async stuckEventRecovery(){
+    async stuckEventRecovery() {
 
         const fiveMinutesAgo = new Date();
         fiveMinutesAgo.setMinutes(fiveMinutesAgo.getMinutes() - 5);
