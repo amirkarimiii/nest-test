@@ -23,9 +23,9 @@ export class BullInfrastructureModule {
                         defaultJobOptions: {
                             removeOnComplete: {count: 100},
                             removeOnFail: {count: 50},
-                            attempts: 3,
+                            attempts: 10,
                             backoff: {
-                                type: 'fixed',
+                                type: 'exponential',
                                 delay: 1000,
                             },
                         },
