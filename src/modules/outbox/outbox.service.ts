@@ -36,7 +36,6 @@ export class OutboxService {
             },
             take: 20,
         });
-
         for (const event of events) {
             switch (event.eventType) {
                 case EventTypesEnum.USER_CREATED: {
@@ -45,10 +44,10 @@ export class OutboxService {
                         await this.prisma.outboxEvent.update({
                             where: {
                                 id: event.id,
-                                status: OutboxStatus.PENDING
                             },
                             data: {
-                                status: OutboxStatus.ENQUEUED
+                                status: OutboxStatus.ENQUEUED,
+                                updatedAt: new Date().toISOString(),
                             }
                         })
                         await this.outboxQueue.addEvent(event.eventType, result.data, event.id)
@@ -58,6 +57,27 @@ export class OutboxService {
                 }
             }
         }
+
+    }
+
+    @Cron(CronExpression.EVERY_5_MINUTES)
+    async stuckEventRecovery(){
+
+        const fiveMinutesAgo = new Date();
+        fiveMinutesAgo.setMinutes(fiveMinutesAgo.getMinutes() - 5);
+
+        await this.prisma.outboxEvent.updateMany({
+            where: {
+                status: OutboxStatus.ENQUEUED,
+                updatedAt: {
+                    lt: fiveMinutesAgo
+                }
+            },
+            data: {
+                status: OutboxStatus.PENDING,
+                updatedAt: new Date().toISOString(),
+            }
+        });
 
     }
 
