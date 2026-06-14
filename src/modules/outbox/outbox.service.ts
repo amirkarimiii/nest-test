@@ -1,9 +1,6 @@
 import {Injectable, Logger, OnModuleInit} from "@nestjs/common";
 import {PrismaService} from "../../infrastructure/database/prisma.service";
-import {EventTypesEnum} from "../../common/enums/event-types.enum";
-import {UserPayloadSchema} from "../../common/types/user-payload.type";
 import {OutboxStatus} from "generated/prisma/enums";
-import {OutboxQueue} from "../../infrastructure/bull/queue/outbox.queue";
 import {Cron, CronExpression} from "@nestjs/schedule";
 import {EventHandlerInterface} from "./event-handler/event-handler.interface";
 import {ModuleRef} from "@nestjs/core";
@@ -17,7 +14,6 @@ export class OutboxService implements OnModuleInit {
 
     constructor(
         private readonly prisma: PrismaService,
-        private readonly outboxQueue: OutboxQueue,
         private readonly moduleRef: ModuleRef
     ) {}
 
@@ -32,7 +28,6 @@ export class OutboxService implements OnModuleInit {
     }
     private readonly logger = new Logger(OutboxService.name);
 
-    @Cron('*/20 * * * * *')
     async publishEvents() {
 
         const events = await this.prisma.outboxEvent.findMany({
@@ -82,7 +77,6 @@ export class OutboxService implements OnModuleInit {
 
     }
 
-    @Cron(CronExpression.EVERY_5_MINUTES)
     async stuckEventRecovery() {
 
         const fiveMinutesAgo = new Date();
@@ -97,7 +91,6 @@ export class OutboxService implements OnModuleInit {
             },
             data: {
                 status: OutboxStatus.PENDING,
-                updatedAt: new Date().toISOString(),
             }
         });
 

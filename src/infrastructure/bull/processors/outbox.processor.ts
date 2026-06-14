@@ -1,10 +1,11 @@
 import {Injectable, Logger} from "@nestjs/common";
 import {OnWorkerEvent, Processor, WorkerHost} from "@nestjs/bullmq";
-import {OUTBOX_QUEUE} from "../../../common/constants/queue.constants";
+import {OUTBOX_QUEUE, PUBLISH_EVENTS_JOB, STUCK_EVENTS_RECOVERY_JOB} from "../constants/bullmq.constants";
 import {Job} from "bullmq";
 import {MicroserviceService} from "../../../modules/microservice/microservice.service";
 import {PrismaService} from "../../database/prisma.service";
 import {OutboxStatus} from "../../../../generated/prisma/enums";
+import {OutboxService} from "../../../modules/outbox/outbox.service";
 
 @Processor(OUTBOX_QUEUE)
 @Injectable()
@@ -15,11 +16,25 @@ export class OutboxProcessor extends WorkerHost {
     constructor(
         private readonly microservice: MicroserviceService,
         private readonly prisma: PrismaService,
+        private readonly outboxService: OutboxService,
     ) {
         super();
     }
 
     async process(job: Job) {
+
+        if (job.name === PUBLISH_EVENTS_JOB) {
+            this.logger.log(`Cron triggered exclusively on instance: ${job.name}`);
+            await this.outboxService.publishEvents();
+            return;
+        }
+
+        if (job.name === STUCK_EVENTS_RECOVERY_JOB) {
+            this.logger.log(`Cron triggered exclusively on instance: ${job.name}`);
+            await this.outboxService.stuckEventRecovery();
+            return;
+        }
+
         const {payload} = job.data;
         const eventType = job.name;
         this.logger.log(`Processing outbox event: ${eventType} [${job.id}]`);

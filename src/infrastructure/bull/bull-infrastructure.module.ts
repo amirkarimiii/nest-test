@@ -1,7 +1,7 @@
 import {DynamicModule, Module} from "@nestjs/common";
 import {BullModule} from "@nestjs/bullmq";
 import {ConfigService} from "@nestjs/config";
-import {OUTBOX_QUEUE} from "../../common/constants/queue.constants";
+import {OUTBOX_QUEUE} from "./constants/bullmq.constants";
 import {OutboxQueue} from "./queue/outbox.queue";
 import {OutboxProcessor} from "./processors/outbox.processor";
 
