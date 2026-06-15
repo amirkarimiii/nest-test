@@ -52,14 +52,26 @@ export class OutboxService implements OnModuleInit {
                 this.logger.error(`No handler found for event type: ${event.eventType}`);
                 continue;
             }
+            if (event.status === OutboxStatus.PROCESSING) {
+                this.logger.warn(`Event ${event.id} is already being processed. Skipping.`);
+                continue
+            }
             try {
-                await handler.handle(event.payload, event.id);
                 await this.prisma.outboxEvent.update({
                     where: {
                         id: event.id,
                     },
                     data: {
                         status: OutboxStatus.ENQUEUED,
+                    }
+                });
+                await handler.handle(event.payload, event.id);
+                await this.prisma.outboxEvent.update({
+                    where: {
+                        id: event.id,
+                    },
+                    data: {
+                        status: OutboxStatus.PROCESSING,
                     }
                 });
             } catch (error) {

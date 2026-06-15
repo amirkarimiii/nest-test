@@ -44,6 +44,7 @@ model OutboxEvent {
 enum OutboxStatus {
   PENDING
   ENQUEUED
+  PRPCESSING
   PROCESSED
   FAILED
 }
