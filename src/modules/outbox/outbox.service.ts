@@ -1,7 +1,6 @@
 import {Injectable, Logger, OnModuleInit} from "@nestjs/common";
 import {PrismaService} from "../../infrastructure/database/prisma.service";
 import {OutboxStatus} from "generated/prisma/enums";
-import {Cron, CronExpression} from "@nestjs/schedule";
 import {EventHandlerInterface} from "./event-handler/event-handler.interface";
 import {ModuleRef} from "@nestjs/core";
 import {UserCreatedHandler} from "./event-handler/user-created.handler";
@@ -104,7 +103,6 @@ export class OutboxService implements OnModuleInit {
                 status: OutboxStatus.PENDING,
             }
         });
-
     }
 
     async getPendingEvents() {

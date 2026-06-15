@@ -7,6 +7,7 @@ import {PrismaService} from "../../database/prisma.service";
 import {OutboxStatus} from "../../../../generated/prisma/enums";
 import {OutboxService} from "../../../modules/outbox/outbox.service";
 
+
 @Processor(OUTBOX_QUEUE)
 @Injectable()
 export class OutboxProcessor extends WorkerHost {
@@ -59,21 +60,40 @@ export class OutboxProcessor extends WorkerHost {
     }
 
     @OnWorkerEvent('failed')
-    async onFailure(job: Job) {
+    async onFailure(job: Job, error: Error) {
 
         const maxAttempts = job.opts.attempts ?? 10;
 
         if (job.attemptsMade >= maxAttempts) {
-            await this.prisma.outboxEvent.update({
-                where: {
-                    id: job.id as string
-                },
-                data: {
-                    status: OutboxStatus.FAILED,
-                    attempts: job.attemptsMade,
-                    lastAttempt: new Date(),
+
+            await this.prisma.$transaction(
+                async (tx) => {
+
+                    await tx.outboxDeadLetter.create({
+                        data: {
+                            outboxEventId: job.id as string,
+                            eventType: job.name,
+                            payload: job.data.payload,
+                            errorMessage: error.message,
+                            errorStack: error.stack,
+                            attempts: job.attemptsMade,
+                        }
+                    });
+
+                    await tx.outboxEvent.delete(
+                        {
+                            where: {
+                                id: job.id as string
+                            }
+                        }
+                    );
                 }
+
+            ).catch((error) => {
+                this.logger.error(`Failed to process job ${job.id}`, error);
+                throw error;
             });
+            this.logger.warn(`Event ${job.id} moved to DLQ after ${job.attemptsMade} attempts. Error: ${error.message}`);
 
         } else {
             await this.prisma.outboxEvent.update({

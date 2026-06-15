@@ -41,6 +41,24 @@ model OutboxEvent {
   @@index([eventType])
 }
 
+
+model OutboxDeadLetter {
+  id            String   @id @default(cuid())
+  outboxEventId String   @unique
+  eventType     String
+  payload       Json
+  errorMessage  String?
+  errorStack    String?
+  attempts      Int      @default(0)
+  failedAt      DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  @@index([eventType])
+  @@index([failedAt])
+}
+
+// ============ enums ============
+
 enum OutboxStatus {
   PENDING
   ENQUEUED

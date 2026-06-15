@@ -17,7 +17,6 @@ export class UserCreatedHandler implements EventHandlerInterface {
             throw new Error(`Validation failed for event ${eventId}: ${result.error}`);
         }
         await this.outboxQueue.addEvent(this.eventType, result.data, eventId);
-
     }
 
 }
