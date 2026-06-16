@@ -5,7 +5,8 @@ import {Job} from "bullmq";
 import {MicroserviceService} from "../../../modules/microservice/microservice.service";
 import {PrismaService} from "../../database/prisma.service";
 import {OutboxStatus} from "../../../../generated/prisma/enums";
-import {OutboxService} from "../../../modules/outbox/outbox.service";
+import {OutboxPublishEventService} from "../../../modules/outbox/pollings/outbox-publish-event.service";
+import {OutboxRecoveryStuckService} from "../../../modules/outbox/pollings/outbox-recovery-stuck.service";
 
 
 @Processor(OUTBOX_QUEUE)
@@ -17,7 +18,8 @@ export class OutboxProcessor extends WorkerHost {
     constructor(
         private readonly microservice: MicroserviceService,
         private readonly prisma: PrismaService,
-        private readonly outboxService: OutboxService,
+        private readonly outboxPublishEventService: OutboxPublishEventService,
+        private readonly outboxRecoveryStuckService: OutboxRecoveryStuckService,
     ) {
         super();
     }
@@ -26,13 +28,13 @@ export class OutboxProcessor extends WorkerHost {
 
         if (job.name === PUBLISH_EVENTS_JOB) {
             this.logger.log(`Cron triggered exclusively on instance: ${job.name}`);
-            await this.outboxService.publishEvents();
+            await this.outboxPublishEventService.publishEvents();
             return;
         }
 
         if (job.name === STUCK_EVENTS_RECOVERY_JOB) {
             this.logger.log(`Cron triggered exclusively on instance: ${job.name}`);
-            await this.outboxService.stuckEventRecovery();
+            await this.outboxRecoveryStuckService.stuckEventRecovery();
             return;
         }
 
