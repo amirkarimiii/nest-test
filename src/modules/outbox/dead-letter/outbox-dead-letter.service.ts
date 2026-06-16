@@ -9,19 +9,20 @@ export class OutboxDeadLetterService {
 
     private readonly logger = new Logger(OutboxDeadLetterService.name);
 
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService) {
+    }
 
-    async getDeadLetters(take = 50) {
+    async getDeadLetters(count = 50) {
         return this.prisma.outboxDeadLetter.findMany({
-            take,
+            take: count,
             orderBy: {failedAt: 'desc'}
         });
     }
 
     async retryFromDeadLetter(id: string) {
-        const dl = await this.prisma.outboxDeadLetter.findUnique(
-            {where: {id}}
-        );
+        const dl = await this.prisma.outboxDeadLetter.findUnique({
+            where: {id}
+        });
         if (!dl)
             throw new Error('Dead letter not found');
 
@@ -37,13 +38,15 @@ export class OutboxDeadLetterService {
             }
         });
 
-        await this.prisma.outboxDeadLetter.delete({where: {id}});
-    }
-
-    async archive(id: string) {
         await this.prisma.outboxDeadLetter.delete(
             {where: {id}}
         );
+    }
+
+    async archive(id: string) {
+        await this.prisma.outboxDeadLetter.delete({
+            where: {id}
+        });
     }
 
 }
