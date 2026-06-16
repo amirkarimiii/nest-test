@@ -27,20 +27,38 @@ model User {
 }
 
 model OutboxEvent {
-  id          String   @id @default(cuid())
-  eventType   String
-  payload     Json
-  status      OutboxStatus @default(PENDING)
-  attempts    Int      @default(0)
-  lastAttempt DateTime?
-  processedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String       @id @default(cuid())
+
+  eventType     String
+  aggregateType String?
+  aggregateId   String?
+
+  payload       Json
+  metadata      Json?
+
+  status        OutboxStatus @default(PENDING)
+  priority      Int          @default(0)
+
+  attempts      Int          @default(0)
+  maxAttempts   Int          @default(10)
+
+  lastAttempt   DateTime?
+  nextAttemptAt DateTime?
+  processedAt   DateTime?
+  processingTimeMs Int?
+  errorMessage  String?
+  errorDetails  Json?
+
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
   @@index([status, createdAt])
+  @@index([status, nextAttemptAt])
+  @@index([status, priority, nextAttemptAt])
   @@index([eventType])
+  @@index([aggregateType, aggregateId])
+  @@index([status, attempts])
 }
-
 
 model OutboxDeadLetter {
   id            String   @id @default(cuid())
